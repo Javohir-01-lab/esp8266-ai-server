@@ -8,25 +8,34 @@ API_KEY = "AIzaSyBlV-VD-2jh-iieThXIItIfeusP0rZpoxs"
 
 @app.get("/")
 def home():
-    return {"message": "Server tayyor!"}
+    return {"message": "Sems AI Server 6.0 tayyor!"}
 
 @app.get("/ask")
 def ask_ai(query: str):
     try:
-        # Eng oddiy va hamma joyda ishlaydigan endpoint
+        # Eng ishonchli v1beta endpointi va gemini-1.5-flash modeli
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
         
         payload = {
-            "contents": [{"parts": [{"text": query}]}]
+            "contents": [{
+                "parts": [{"text": f"Sening isming Sem. Sen aqlli yordamchi muhandissan. Savolga juda qisqa javob ber. Savol: {query}"}]
+            }]
         }
         
-        response = requests.post(url, json=payload)
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(url, json=payload, headers=headers)
         res_json = response.json()
         
-        # Agar xato bo'lsa, xatoni o'zini ko'rsatadi
+        # Xatolikni tekshirish
         if "error" in res_json:
-            return {"reply": "Google xatosi: " + res_json["error"]["message"]}
-            
-        return {"reply": res_json["candidates"][0]["content"]["parts"][0]["text"]}
+            return {"reply": f"Google API Xatosi: {res_json['error']['message']}"}
+
+        # Javobni olish
+        if "candidates" in res_json:
+            answer = res_json["candidates"][0]["content"]["parts"][0]["text"]
+            return {"reply": answer}
+        else:
+            return {"reply": "Google javob qaytarmadi, xato format."}
+
     except Exception as e:
-        return {"reply": "Tizim xatosi: " + str(e)}
+        return {"reply": f"Serverda texnik xato: {str(e)}"}
