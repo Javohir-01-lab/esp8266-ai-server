@@ -3,38 +3,30 @@ import requests
 
 app = FastAPI()
 
-# API kalitini o'rnating
-GOOGLE_API_KEY = "AIzaSyBlV-VD-2jh-iieThXIItIfeusP0rZpoxs"
+# YANGI OLINGAN API KALITNI SHU YERGA QO'YING
+API_KEY = "AIzaSyBlV-VD-2jh-iieThXIItIfeusP0rZpoxs"
 
 @app.get("/")
 def home():
-    return {"message": "Sems AI Server 5.0 ishlayapti!"}
+    return {"message": "Server tayyor!"}
 
 @app.get("/ask")
 def ask_ai(query: str):
     try:
-        # Gemini 1.0 Pro modeliga murojaat qilamiz (eng barqaror variant)
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GOOGLE_API_KEY}"
+        # Eng oddiy va hamma joyda ishlaydigan endpoint
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
         
         payload = {
-            "contents": [{
-                "parts": [{"text": f"Sening isming Sem. Sen aqlli yordamchisans. Savolga juda qisqa javob ber. Savol: {query}"}]
-            }]
+            "contents": [{"parts": [{"text": query}]}]
         }
         
-        headers = {'Content-Type': 'application/json'}
-        response = requests.post(url, json=payload, headers=headers)
+        response = requests.post(url, json=payload)
         res_json = response.json()
         
+        # Agar xato bo'lsa, xatoni o'zini ko'rsatadi
         if "error" in res_json:
-            # Agar gemini-pro ham ishlamasa, oxirgi chora sifatida gemini-1.0-pro ni sinaymiz
-            return {"reply": f"Google API Xatosi: {res_json['error']['message']}"}
-
-        if "candidates" in res_json:
-            answer = res_json["candidates"][0]["content"]["parts"][0]["text"]
-            return {"reply": answer}
-        else:
-            return {"reply": "Google javob qaytarmadi."}
-
+            return {"reply": "Google xatosi: " + res_json["error"]["message"]}
+            
+        return {"reply": res_json["candidates"][0]["content"]["parts"][0]["text"]}
     except Exception as e:
-        return {"reply": f"Serverda texnik xato: {str(e)}"}
+        return {"reply": "Tizim xatosi: " + str(e)}
