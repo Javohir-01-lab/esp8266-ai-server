@@ -4,25 +4,30 @@ import os
 
 app = FastAPI()
 
-# API kalitini o'rnatish
+# API kaliti
 GOOGLE_API_KEY = "AIzaSyCZTpdwJzQ8a85JGD491l1ygDZtNiD3ZhY"
 genai.configure(api_key=GOOGLE_API_KEY)
 
-# Modelni tanlash (To'g'ri yozilgan varianti)
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
+# Modelni aniq va to'g'ri ko'rinishda tanlash
+# 'gemini-1.5-flash' modeli hozirda eng tezkor va barqaror hisoblanadi
+model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 
 @app.get("/")
 def home():
-    return {"message": "Server ishlayapti!"}
+    return {"message": "Sem AI Server ishlayapti!"}
 
 @app.get("/ask")
 def ask_ai(query: str):
     try:
         # Tizimga Sem (JARVIS uslubida) xarakterini beramiz
         instruction = "Sen aqlli yordamchi Semsan. Foydalanuvchi murojaat qilsa 'Ha, janob' deb javob ber va savolga juda qisqa javob qaytar."
-        full_prompt = f"{instruction}\n\nSavol: {query}"
         
-        response = model.generate_content(full_prompt)
+        # Javobni generatsiya qilish
+        response = model.generate_content(f"{instruction}\n\nSavol: {query}")
+        
+        # Javob matnini qaytarish
         return {"reply": response.text}
     except Exception as e:
-        return {"reply": "Xatolik yuz berdi. Iltimos qaytadan urinib ko'ring."}
+        # Xatolikni aniq ko'rish uchun terminalga chiqaramiz
+        print(f"Xato yuz berdi: {e}")
+        return {"reply": "Xatolik: " + str(e)}
