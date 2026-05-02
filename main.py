@@ -7,7 +7,7 @@ app = FastAPI()
 # API kalitini bu yerga qo'ying (yoki Render env-da saqlang)
 GOOGLE_API_KEY = "AIzaSyCZTpdwJzQ8a85JGD491l1ygDZtNiD3ZhY"
 genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-pro')
 
 @app.get("/")
 def home():
