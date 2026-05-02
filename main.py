@@ -23,14 +23,16 @@ def ask_ai(query: str):
             "Content-Type": "application/json"
         }
         
-        payload = {
-            # YANGI VA BARQAROR MODEL NOMI
-            "model": "llama-3.1-8b-instant",
-            "messages": [
-                {"role": "system", "content": "Sening isming Sem. Sen aqlli yordamchi muhandissan. Juda qisqa va aniq javob ber."},
-                {"role": "user", "content": query}
-            ]
-        }
+          payload = {
+    "model": "llama-3.1-8b-instant",
+    "messages": [
+        {
+            "role": "system", 
+            "content": "Sening isming Sem. Sen aqlli va ko'p qirali mutaxasis yordamchisan. Har doim o'zbek tilida juda qisqa, aniq va london javob ber!."
+        },
+        {"role": "user", "content": query}
+    ]
+} 
         
         response = requests.post(url, json=payload, headers=headers)
         res_json = response.json()
