@@ -8,7 +8,7 @@ GROQ_API_KEY = "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"
 
 @app.get("/")
 def home():
-    return {"message": "Sems AI (Groq) ishlamoqda!"}
+    return {"message": "Sems AI 2026 ishlamoqda!"}
 
 @app.get("/ask")
 def ask_ai(query: str):
@@ -21,7 +21,8 @@ def ask_ai(query: str):
         }
         
         payload = {
-            "model": "llama3-8b-8192",
+            # YANGI MODEL NOMI: llama-3.1-8b-instant
+            "model": "llama-3.1-8b-instant",
             "messages": [
                 {"role": "system", "content": "Sen Semsan, aqlli yordamchi muhandissan. Juda qisqa va aniq javob ber."},
                 {"role": "user", "content": query}
