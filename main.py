@@ -1,30 +1,37 @@
 from fastapi import FastAPI
-import google.generativeai as genai
+import requests
 
 app = FastAPI()
 
-# API kaliti
+# MA'LUMOTLAR
 GOOGLE_API_KEY = "AIzaSyCZTpdwJzQ8a85JGD491l1ygDZtNiD3ZhY"
-genai.configure(api_key=GOOGLE_API_KEY)
-
-# Modelni barqaror nom bilan yuklash
-model = genai.GenerativeModel('gemini-1.5-flash')
+# To'g'ridan-to'g'ri Google API havolasi
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
 
 @app.get("/")
 def home():
-    return {"message": "Server ishlamoqda!"}
+    return {"message": "Sems AI Server 2.0 ishlayapti!"}
 
 @app.get("/ask")
 def ask_ai(query: str):
     try:
-        # Promptni yuboramiz
-        response = model.generate_content(f"Sen Semsan. Savol: {query}")
+        # Google API ga yuboriladigan ma'lumot (JSON formatida)
+        payload = {
+            "contents": [{
+                "parts": [{"text": f"Sen aqlli yordamchi Semsan. Savolga juda qisqa javob ber. Savol: {query}"}]
+            }]
+        }
         
-        # Javobni tekshirish
-        if response and response.text:
-            return {"reply": response.text}
+        # Zapros yuboramiz
+        response = requests.post(API_URL, json=payload)
+        res_json = response.json()
+        
+        # Javobni ichidan sug'urib olamiz
+        if "candidates" in res_json:
+            answer = res_json["candidates"][0]["content"]["parts"][0]["text"]
+            return {"reply": answer}
         else:
-            return {"reply": "Kechirasiz, javob topilmadi."}
-            
+            return {"reply": "Xatolik: Google javob bermadi. Kalitni tekshiring."}
+
     except Exception as e:
-        return {"reply": f"API Xatosi: {str(e)}"}
+        return {"reply": f"Server xatosi: {str(e)}"}
