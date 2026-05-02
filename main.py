@@ -14,10 +14,20 @@ def ask_ai(query: str):
         # 1. AI-dan javob olish
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-        payload = {
-            "model": "llama-3.1-8b-instant",
-            "messages": [{"role": "system", "content": "Isming Sem. Muhandis yordamchisan. Qisqa javob ber."},
-                        {"role": "user", "content": query}]
+       payload = {
+            "model": "llama-3.1-70b-versatile", # Kuchliroq va aqlliroq model (70B)
+            "messages": [
+                {
+                    "role": "system", 
+                    "content": """Sening isming Sem. Sen kuchli muhandissan va Javohirning eng yaqin yordamchisan. 
+                    Robot kabi 'Salom, nima yordam kerak' deb gapirma. 
+                    Mantiqiy, do'stona va xuddi odamdek gaplash. Muhandislik masalalarida o'z fikringni bildir. 
+                    Javoblaring qisqa, lekin mazmunli bo'lsin."""
+                },
+                {"role": "user", "content": query}
+            ],
+            "temperature": 0.7, # Bu parametr AIni ijodiyroq va jonliroq qiladi
+        }
         }
         response = requests.post(url, json=payload, headers=headers)
         answer = response.json()["choices"][0]["message"]["content"]
