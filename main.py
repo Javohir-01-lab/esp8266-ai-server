@@ -3,22 +3,22 @@ import requests
 
 app = FastAPI()
 
-# YANGI OLINGAN API KALIT
+# API kalitini o'rnating
 API_KEY = "AIzaSyBlV-VD-2jh-iieThXIItIfeusP0rZpoxs"
 
 @app.get("/")
 def home():
-    return {"message": "Sems AI Server ishlamoqda!"}
+    return {"message": "Sems Server 7.0 ishlamoqda!"}
 
 @app.get("/ask")
 def ask_ai(query: str):
     try:
-        # DIQQAT: v1 versiyasi va aniq model nomi
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+        # Eng barqaror va hamma joyda ishlaydigan endpoint (v1beta)
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
         
         payload = {
             "contents": [{
-                "parts": [{"text": f"Sen aqlli yordamchi Semsan. Qisqa javob ber: {query}"}]
+                "parts": [{"text": f"Sen Semsan. Juda qisqa javob ber: {query}"}]
             }]
         }
         
@@ -26,16 +26,18 @@ def ask_ai(query: str):
         response = requests.post(url, json=payload, headers=headers)
         res_json = response.json()
         
-        # Agar xatolik bo'lsa, xatoni o'zini qaytaramiz
+        # Xatolikni aniqlash
         if "error" in res_json:
-            return {"reply": f"Xato: {res_json['error']['message']}"}
+            # Agar gemini-1.5-flash topilmasa, gemini-pro ni sinab ko'ramiz
+            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
+            response = requests.post(fallback_url, json=payload, headers=headers)
+            res_json = response.json()
 
-        # Javobni qaytarish
         if "candidates" in res_json:
             answer = res_json["candidates"][0]["content"]["parts"][0]["text"]
             return {"reply": answer}
         else:
-            return {"reply": "Google javob qaytarmadi."}
+            return {"reply": "Google hozircha band, birozdan so'ng urinib ko'ring."}
 
     except Exception as e:
         return {"reply": f"Texnik xato: {str(e)}"}
