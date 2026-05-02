@@ -1,3 +1,6 @@
+
+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
+
 from fastapi import FastAPI
 import requests
 
@@ -8,7 +11,7 @@ GROQ_API_KEY = "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"
 
 @app.get("/")
 def home():
-    return {"message": "Sems AI 2026 ishlamoqda!"}
+    return {"message": "Sems AI 2026 (Llama 3.1) ishlamoqda!"}
 
 @app.get("/ask")
 def ask_ai(query: str):
@@ -21,10 +24,10 @@ def ask_ai(query: str):
         }
         
         payload = {
-            # YANGI MODEL NOMI: llama-3.1-8b-instant
+            # YANGI VA BARQAROR MODEL NOMI
             "model": "llama-3.1-8b-instant",
             "messages": [
-                {"role": "system", "content": "Sen Semsan, aqlli yordamchi muhandissan. Juda qisqa va aniq javob ber."},
+                {"role": "system", "content": "Sening isming Sem. Sen aqlli yordamchi muhandissan. Juda qisqa va aniq javob ber."},
                 {"role": "user", "content": query}
             ]
         }
@@ -36,7 +39,7 @@ def ask_ai(query: str):
             answer = res_json["choices"][0]["message"]["content"]
             return {"reply": answer}
         else:
-            return {"reply": f"Xato: {str(res_json)}"}
+            return {"reply": f"Groq API xatosi: {str(res_json)}"}
 
     except Exception as e:
-        return {"reply": f"Serverda xato: {str(e)}"}
+        return {"reply": f"Serverda texnik xato: {str(e)}"}
