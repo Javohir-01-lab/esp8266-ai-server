@@ -4,7 +4,7 @@ import requests
 app = FastAPI()
 
 # MA'LUMOTLAR
-GOOGLE_API_KEY = "AIzaSyCZTpdwJzQ8a85JGD491l1ygDZtNiD3ZhY"
+GOOGLE_API_KEY = "AIzaSyBlV-VD-2jh-iieThXIItIfeusP0rZpoxs"
 # To'g'ridan-to'g'ri Google API havolasi
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
 
