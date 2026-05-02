@@ -3,43 +3,29 @@ import requests
 
 app = FastAPI()
 
-# GROQ API KALITINI SHU YERGA QO'YING
+# MA'LUMOTLAR
 GROQ_API_KEY = "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"
-
-@app.get("/")
-def home():
-    return "Sem AI Server ishlamoqda!"
+TELEGRAM_TOKEN = "8654947812:AAHe-zuEdL0rob1v6M_v5f85P8IypbCDvf8"
+CHAT_ID = "8565555123" # @userinfobot orqali bilib oling
 
 @app.get("/ask")
 def ask_ai(query: str):
     try:
+        # 1. AI-dan javob olish
         url = "https://api.groq.com/openai/v1/chat/completions"
-        
-        headers = {
-            "Authorization": f"Bearer {GROQ_API_KEY}",
-            "Content-Type": "application/json"
-        }
-        
+        headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
         payload = {
             "model": "llama-3.1-8b-instant",
-            "messages": [
-                {
-                    "role": "system", 
-                    "content": "Sening isming Sem. Sen aqlli muhandis yordamchisan. Har doim o'zbek tilida juda qisqa, bir jumlada javob ber."
-                },
-                {"role": "user", "content": query}
-            ]
+            "messages": [{"role": "system", "content": "Isming Sem. Muhandis yordamchisan. Qisqa javob ber."},
+                        {"role": "user", "content": query}]
         }
-        
         response = requests.post(url, json=payload, headers=headers)
-        res_json = response.json()
-        
-        if "choices" in res_json:
-            # FAQAT MATNNI QAYTARAMIZ (ESP8266 oson o'qishi uchun)
-            answer = res_json["choices"][0]["message"]["content"]
-            return answer
-        else:
-            return "Xato: API javob bermadi."
+        answer = response.json()["choices"][0]["message"]["content"]
 
+        # 2. Telegramga yuborish (Sizga qulay bo'lishi uchun)
+        tg_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        requests.post(tg_url, json={"chat_id": CHAT_ID, "text": f"🤖 Sem: {answer}"})
+
+        return answer
     except Exception as e:
-        return f"Serverda xato: {str(e)}"
+        return f"Xato: {str(e)}"
