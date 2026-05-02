@@ -3,18 +3,18 @@ import requests
 
 app = FastAPI()
 
-# YANGI API KALITNI SHU YERGA QO'YING
+# API kalitini o'rnating
 GOOGLE_API_KEY = "AIzaSyBlV-VD-2jh-iieThXIItIfeusP0rZpoxs"
 
 @app.get("/")
 def home():
-    return {"message": "Sems AI Server 3.0 ishlayapti!"}
+    return {"message": "Sems AI Server 4.0 ishlayapti!"}
 
 @app.get("/ask")
 def ask_ai(query: str):
     try:
-        # Google API Endpoint (v1 versiyasi barqarorroq)
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
+        # API yo'li (Model nomi models/ prefiksi bilan va v1beta versiyasi)
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
         
         payload = {
             "contents": [{
@@ -26,7 +26,7 @@ def ask_ai(query: str):
         response = requests.post(url, json=payload, headers=headers)
         res_json = response.json()
         
-        # Xatolikni aniqlash uchun logga chiqaramiz
+        # Xatolikni tekshirish
         if "error" in res_json:
             return {"reply": f"Google API Xatosi: {res_json['error']['message']}"}
 
@@ -34,7 +34,7 @@ def ask_ai(query: str):
             answer = res_json["candidates"][0]["content"]["parts"][0]["text"]
             return {"reply": answer}
         else:
-            return {"reply": "Google'dan kutilmagan javob keldi."}
+            return {"reply": "Google javob qaytarmadi, xato format."}
 
     except Exception as e:
-        return {"reply": f"Serverda xato: {str(e)}"}
+        return {"reply": f"Serverda texnik xato: {str(e)}"}
