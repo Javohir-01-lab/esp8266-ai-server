@@ -3,41 +3,39 @@ import requests
 
 app = FastAPI()
 
-# API kalitini o'rnating
-API_KEY = "AIzaSyBlV-VD-2jh-iieThXIItIfeusP0rZpoxs"
+# GROQ API KALITINI SHU YERGA QO'YING
+GROQ_API_KEY = "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"
 
 @app.get("/")
 def home():
-    return {"message": "Sems Server 7.0 ishlamoqda!"}
+    return {"message": "Sems AI (Groq) ishlamoqda!"}
 
 @app.get("/ask")
 def ask_ai(query: str):
     try:
-        # Eng barqaror va hamma joyda ishlaydigan endpoint (v1beta)
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+        url = "https://api.groq.com/openai/v1/chat/completions"
         
-        payload = {
-            "contents": [{
-                "parts": [{"text": f"Sen Semsan. Juda qisqa javob ber: {query}"}]
-            }]
+        headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
         }
         
-        headers = {'Content-Type': 'application/json'}
+        payload = {
+            "model": "llama3-8b-8192",
+            "messages": [
+                {"role": "system", "content": "Sen Semsan, aqlli yordamchi muhandissan. Juda qisqa va aniq javob ber."},
+                {"role": "user", "content": query}
+            ]
+        }
+        
         response = requests.post(url, json=payload, headers=headers)
         res_json = response.json()
         
-        # Xatolikni aniqlash
-        if "error" in res_json:
-            # Agar gemini-1.5-flash topilmasa, gemini-pro ni sinab ko'ramiz
-            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
-            response = requests.post(fallback_url, json=payload, headers=headers)
-            res_json = response.json()
-
-        if "candidates" in res_json:
-            answer = res_json["candidates"][0]["content"]["parts"][0]["text"]
+        if "choices" in res_json:
+            answer = res_json["choices"][0]["message"]["content"]
             return {"reply": answer}
         else:
-            return {"reply": "Google hozircha band, birozdan so'ng urinib ko'ring."}
+            return {"reply": f"Xato: {str(res_json)}"}
 
     except Exception as e:
-        return {"reply": f"Texnik xato: {str(e)}"}
+        return {"reply": f"Serverda xato: {str(e)}"}
