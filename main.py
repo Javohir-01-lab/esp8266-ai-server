@@ -3,22 +3,22 @@ import requests
 
 app = FastAPI()
 
-# YANGI OLINGAN API KALITNI SHU YERGA QO'YING
+# YANGI OLINGAN API KALIT
 API_KEY = "AIzaSyBlV-VD-2jh-iieThXIItIfeusP0rZpoxs"
 
 @app.get("/")
 def home():
-    return {"message": "Sems AI Server 6.0 tayyor!"}
+    return {"message": "Sems AI Server ishlamoqda!"}
 
 @app.get("/ask")
 def ask_ai(query: str):
     try:
-        # Eng ishonchli v1beta endpointi va gemini-1.5-flash modeli
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+        # DIQQAT: v1 versiyasi va aniq model nomi
+        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={API_KEY}"
         
         payload = {
             "contents": [{
-                "parts": [{"text": f"Sening isming Sem. Sen aqlli yordamchi muhandissan. Savolga juda qisqa javob ber. Savol: {query}"}]
+                "parts": [{"text": f"Sen aqlli yordamchi Semsan. Qisqa javob ber: {query}"}]
             }]
         }
         
@@ -26,16 +26,16 @@ def ask_ai(query: str):
         response = requests.post(url, json=payload, headers=headers)
         res_json = response.json()
         
-        # Xatolikni tekshirish
+        # Agar xatolik bo'lsa, xatoni o'zini qaytaramiz
         if "error" in res_json:
-            return {"reply": f"Google API Xatosi: {res_json['error']['message']}"}
+            return {"reply": f"Xato: {res_json['error']['message']}"}
 
-        # Javobni olish
+        # Javobni qaytarish
         if "candidates" in res_json:
             answer = res_json["candidates"][0]["content"]["parts"][0]["text"]
             return {"reply": answer}
         else:
-            return {"reply": "Google javob qaytarmadi, xato format."}
+            return {"reply": "Google javob qaytarmadi."}
 
     except Exception as e:
-        return {"reply": f"Serverda texnik xato: {str(e)}"}
+        return {"reply": f"Texnik xato: {str(e)}"}
